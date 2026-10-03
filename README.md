@@ -28,37 +28,9 @@
     - web面板 或许你更加熟悉.
 - 官网/用户手册: [clashmi.app](https://clashmi.app)
 
-##### 注意: 
-- **Clash Mi或KaringX未在任何视频平台开设过任何频道**
-- [Clash Mi唯一官网](https://clashmi.app): https://clashmi.app
-	- **请勿相信其他网址提供的信息、下载二次打包的软件**
+## 推荐机场
 
-## 推广
-<details>
-<summary>查看所有推广
-
-
-
-### ✈️推荐机场
-
-[🐶狗狗加速 —— 技术流机场 Doggygo VPN](https://2.x31415926.top/redir.html?url=aHR0cHM6Ly93d3cuZGc2LnRvcC8jL3JlZ2lzdGVyP2NvZGU9bEZINGlpOUQ=&i=3eb&t=1723644053)
-
-- 高性能海外机场，海外团队，无跑路风险
-- 专属链接注册送 3 天，每天 1G 流量 [免费试用](https://2.x31415926.top/redir.html?url=aHR0cHM6Ly93d3cuZGc2LnRvcC8jL3JlZ2lzdGVyP2NvZGU9bEZINGlpOUQ=&i=3eb&t=1723644053)
-- 优惠套餐每月仅需 15.8 元，160G 流量，年付 8 折
-- 全球首家支持`Hysteria2` 协议，集群负载均衡设计，高速专线，极低延迟，无视晚高峰，4K 秒开
-- 解锁流媒体及 ChatGPT
-
-[👉更多机场优惠 每日更新](https://2.x31415926.top/)
-
-</summary>
-
-### 🤝机场合作招募
-- 👉[联系方式与合作形式](https://karing.app/blog/isp/cooperation)👈
-</details>
-
-
-
+- [清茶云](https://qingcha.fyi/register/?code=JYaLVRCv) —— 本仓库兼容修复所针对的订阅来源。
 
 ## 安装
 - **IOS AppStore**: （搜索关键词：clash mi）
@@ -92,14 +64,6 @@
   <img src="./assets/demo/home.png" alt="app: home" width="50%" />
   </br></br>
 </div>
-
-## 提交需求/bug
-- [欢迎报告bug及需求！](https://github.com/KaringX/clashmi/issues)
-- [ClashMiApp 电报群](https://t.me/ClashMiApp)
-
-
-## 捐赠
-- [请开发者喝一杯](https://clashmi.app/donate)
 
 ## Projects 
 
