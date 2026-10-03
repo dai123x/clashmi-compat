@@ -1,0 +1,23 @@
+name: qingcha-cloud-compat-check
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * *" # 每天一次,盯住 mihomo 新版本对清茶云配置写法的解析回归
+  push:
+    paths:
+      - "compat_test/**"
+
+jobs:
+  compat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run qingcha cloud compat matrix
+        run: python compat_test/check_compat.py

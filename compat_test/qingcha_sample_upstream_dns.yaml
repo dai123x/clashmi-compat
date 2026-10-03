@@ -1,0 +1,195 @@
+mixed-port: 7890
+allow-lan: false
+mode: rule
+log-level: info
+external-controller: 127.0.0.1:9090
+unified-delay: true
+tcp-concurrent: true
+dns:
+  enable: true
+  ipv6: false
+  default-nameserver:
+  - 223.5.5.5
+  - 119.29.29.29
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  use-hosts: true
+  nameserver:
+  - https://doh.pub/dns-query
+  - https://dns.alidns.com/dns-query
+  fallback:
+  - https://doh.dns.sb/dns-query
+  - https://dns.cloudflare.com/dns-query
+  - https://dns.twnic.tw/dns-query
+  - tls://8.8.4.4:853
+  fallback-filter:
+    geoip: true
+    ipcidr:
+    - 240.0.0.0/4
+    - 0.0.0.0/32
+proxies:
+- name: 🇯🇵 日本 01
+  type: vless
+  server: 01.example.invalid
+  port: 24820
+  uuid: 00000000-0000-0000-0000-000000000000
+  alterId: 0
+  cipher: auto
+  udp: true
+  flow: xtls-rprx-vision
+  encryption: none
+  tls: true
+  skip-cert-verify: false
+  servername: www.tesla.com
+  reality-opts:
+    public-key: x8bLvXSPqWLJl0sF1GkUeV7rYnY3iPh9t2Wm5cQd0Eb
+    short-id: null
+  client-fingerprint: qq
+  network: tcp
+- name: 🇯🇵 日本 02
+  type: vless
+  server: 02.example.invalid
+  port: 24842
+  uuid: 00000000-0000-0000-0000-000000000000
+  alterId: 0
+  cipher: auto
+  udp: true
+  flow: xtls-rprx-vision
+  encryption: none
+  tls: true
+  skip-cert-verify: false
+  servername: www.tesla.com
+  reality-opts:
+    public-key: x8bLvXSPqWLJl0sF1GkUeV7rYnY3iPh9t2Wm5cQd0Eb
+    short-id: null
+  client-fingerprint: safari
+  network: tcp
+- name: 🇸🇬 狮城 01
+  type: vless
+  server: 01.example.invalid
+  port: 24808
+  uuid: 00000000-0000-0000-0000-000000000000
+  alterId: 0
+  cipher: auto
+  udp: true
+  flow: xtls-rprx-vision
+  encryption: none
+  tls: true
+  skip-cert-verify: false
+  servername: www.tesla.com
+  reality-opts:
+    public-key: x8bLvXSPqWLJl0sF1GkUeV7rYnY3iPh9t2Wm5cQd0Eb
+    short-id: null
+  client-fingerprint: qq
+  network: tcp
+- name: 🇸🇬 狮城 02
+  type: vless
+  server: 02.example.invalid
+  port: 24810
+  uuid: 00000000-0000-0000-0000-000000000000
+  alterId: 0
+  cipher: auto
+  udp: true
+  flow: xtls-rprx-vision
+  encryption: none
+  tls: true
+  skip-cert-verify: false
+  servername: www.tesla.com
+  reality-opts:
+    public-key: x8bLvXSPqWLJl0sF1GkUeV7rYnY3iPh9t2Wm5cQd0Eb
+    short-id: null
+  client-fingerprint: qq
+  network: tcp
+- name: 🇺🇸 美国 01
+  type: vless
+  server: 01.example.invalid
+  port: 24822
+  uuid: 00000000-0000-0000-0000-000000000000
+  alterId: 0
+  cipher: auto
+  udp: true
+  flow: xtls-rprx-vision
+  encryption: none
+  tls: true
+  skip-cert-verify: false
+  servername: www.tesla.com
+  reality-opts:
+    public-key: x8bLvXSPqWLJl0sF1GkUeV7rYnY3iPh9t2Wm5cQd0Eb
+    short-id: null
+  client-fingerprint: qq
+  network: tcp
+- name: 🇰🇷 韩国
+  type: vless
+  server: 韩国.example.invalid
+  port: 24819
+  uuid: 00000000-0000-0000-0000-000000000000
+  alterId: 0
+  cipher: auto
+  udp: true
+  flow: xtls-rprx-vision
+  encryption: none
+  tls: true
+  skip-cert-verify: false
+  servername: www.tesla.com
+  reality-opts:
+    public-key: x8bLvXSPqWLJl0sF1GkUeV7rYnY3iPh9t2Wm5cQd0Eb
+    short-id: null
+  client-fingerprint: edge
+  network: tcp
+proxy-groups:
+- name: 清茶云
+  type: select
+  proxies:
+  - 自动选择
+  - 故障转移
+  - 🇯🇵 日本 01
+  - 🇯🇵 日本 02
+  - 🇸🇬 狮城 01
+  - 🇸🇬 狮城 02
+  - 🇺🇸 美国 01
+  - 🇰🇷 韩国
+- name: 自动选择
+  type: url-test
+  proxies:
+  - 🇯🇵 日本 01
+  - 🇯🇵 日本 02
+  - 🇸🇬 狮城 01
+  - 🇸🇬 狮城 02
+  - 🇺🇸 美国 01
+  - 🇰🇷 韩国
+  url: http://www.gstatic.com/generate_204
+  interval: 86400
+- name: 故障转移
+  type: fallback
+  proxies:
+  - 🇯🇵 日本 01
+  - 🇯🇵 日本 02
+  - 🇸🇬 狮城 01
+  - 🇸🇬 狮城 02
+  - 🇺🇸 美国 01
+  - 🇰🇷 韩国
+  url: http://www.gstatic.com/generate_204
+  interval: 7200
+rules:
+- DOMAIN,qcyun.fyi,DIRECT
+- DOMAIN-SUFFIX,services.googleapis.cn,清茶云
+- DOMAIN-SUFFIX,xn--ngstr-lra8j.com,清茶云
+- DOMAIN,safebrowsing.urlsec.qq.com,DIRECT
+- DOMAIN,safebrowsing.googleapis.com,DIRECT
+- DOMAIN,developer.apple.com,清茶云
+- DOMAIN-SUFFIX,digicert.com,清茶云
+- DOMAIN,ocsp.apple.com,清茶云
+- DOMAIN,ocsp.comodoca.com,清茶云
+- DOMAIN,ocsp.usertrust.com,清茶云
+- DOMAIN,ocsp.sectigo.com,清茶云
+- DOMAIN,ocsp.verisign.net,清茶云
+- DOMAIN-SUFFIX,apple-dns.net,清茶云
+- DOMAIN,testflight.apple.com,清茶云
+- DOMAIN,sandbox.itunes.apple.com,清茶云
+- DOMAIN,itunes.apple.com,清茶云
+- DOMAIN-SUFFIX,apps.apple.com,清茶云
+- DOMAIN-SUFFIX,blobstore.apple.com,清茶云
+- DOMAIN,cvws.icloud-content.com,清茶云
+- DOMAIN-SUFFIX,mzstatic.com,DIRECT
+- GEOIP,CN,DIRECT
+- MATCH,清茶云
