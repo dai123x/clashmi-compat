@@ -76,3 +76,7 @@ ios/clashmiWidget/VpnServiceHandler.swift
 
 # compat test local cache (downloaded mihomo cores)
 compat_test/bin/
+
+# local CI log downloads
+/ci_logs/
+ci_logs/

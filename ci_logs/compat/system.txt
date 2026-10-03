@@ -1,8 +1,0 @@
-2026-10-03T14:14:15.7470000Z Requested labels: ubuntu-latest
-2026-10-03T14:14:15.7470000Z Job defined at: dai123x/clashmi-compat/.github/workflows/compat-check.yml@refs/heads/main
-2026-10-03T14:14:15.7470000Z Waiting for a runner to pick up this job...
-2026-10-03T14:14:15.7490000Z Job is waiting for a hosted runner to come online.
-2026-10-03T14:14:15.7500000Z Job is about to start running on the hosted runner: GitHub Actions 1000000269
-2026-10-03T14:14:15.7450000Z Evaluating compat.if
-2026-10-03T14:14:15.7450000Z Evaluating: success()
-2026-10-03T14:14:15.7450000Z Result: true
