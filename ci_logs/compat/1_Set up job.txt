@@ -1,0 +1,33 @@
+﻿2026-10-03T14:14:17.4807280Z Current runner version: '2.337.0'
+2026-10-03T14:14:17.4841844Z ##[group]Runner Image Provisioner
+2026-10-03T14:14:17.4843083Z Hosted Compute Agent
+2026-10-03T14:14:17.4844125Z Version: 20260901.588
+2026-10-03T14:14:17.4844980Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+2026-10-03T14:14:17.4846057Z Build Date: 2026-09-01T19:56:44Z
+2026-10-03T14:14:17.4846987Z Worker ID: {b238908d-0a18-4807-8a54-9c1a6d499cb7}
+2026-10-03T14:14:17.4847984Z Azure Region: eastus
+2026-10-03T14:14:17.4848802Z ##[endgroup]
+2026-10-03T14:14:17.4850595Z ##[group]Operating System
+2026-10-03T14:14:17.4851705Z Ubuntu
+2026-10-03T14:14:17.4852443Z 24.04.5
+2026-10-03T14:14:17.4853197Z LTS
+2026-10-03T14:14:17.4854028Z ##[endgroup]
+2026-10-03T14:14:17.4854784Z ##[group]Runner Image
+2026-10-03T14:14:17.4855695Z Image: ubuntu-24.04
+2026-10-03T14:14:17.4856486Z Version: 20260927.320.1
+2026-10-03T14:14:17.4858094Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-03T14:14:17.4860786Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+2026-10-03T14:14:17.4862446Z ##[endgroup]
+2026-10-03T14:14:17.4865027Z ##[group]GITHUB_TOKEN Permissions
+2026-10-03T14:14:17.4868404Z Contents: read
+2026-10-03T14:14:17.4869146Z Metadata: read
+2026-10-03T14:14:17.4869957Z Packages: read
+2026-10-03T14:14:17.4870706Z ##[endgroup]
+2026-10-03T14:14:17.4874678Z Secret source: Actions
+2026-10-03T14:14:17.4875998Z Cache mode: write
+2026-10-03T14:14:17.4877771Z Prepare workflow directory
+2026-10-03T14:14:17.6344173Z Prepare all required actions
+2026-10-03T14:14:17.6388231Z Getting action download info
+2026-10-03T14:14:17.8049558Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-03T14:14:18.0517524Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-10-03T14:14:18.6333325Z Complete job name: compat

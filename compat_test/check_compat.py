@@ -27,21 +27,29 @@ import zipfile
 
 PINNED = "v1.19.25"  # clash-verge-rev v2.5.1 时代内核,已知兼容基线
 LATEST_API = "https://api.github.com/repos/MetaCubeX/mihomo/releases/latest"
-DOWNLOAD = "https://github.com/MetaCubeX/mihomo/releases/download/{tag}/mihomo-{slug}-{tag}.zip"
+RELEASE_API = "https://api.github.com/repos/MetaCubeX/mihomo/releases/tags/{tag}"
 GEOIP = "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.metadb"
 HERE = os.path.dirname(os.path.abspath(__file__))
 MUST_PASS = os.path.join(HERE, "qingcha_sample.yaml")
 REPORT_ONLY = os.path.join(HERE, "qingcha_sample_upstream_dns.yaml")
 
 
+def gh_get(url):
+    headers = {"Accept": "application/vnd.github+json"}
+    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    req = urllib.request.Request(url, headers=headers)
+    with urllib.request.urlopen(req, timeout=60) as resp:
+        return resp.read()
+
+
 def latest_tag():
-    req = urllib.request.Request(LATEST_API, headers={"Accept": "application/vnd.github+json"})
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        return json.loads(resp.read())["tag_name"]
+    return json.loads(gh_get(LATEST_API))["tag_name"]
 
 
 def core_slug(tag):
-    """release 资产与压缩包内文件的公共命名段,如 windows-amd64-v2。"""
+    """release 资产的平台命名段,如 windows-amd64-v2 / linux-amd64-v2。"""
     system = platform.system().lower()
     machine = platform.machine().lower()
     if system == "windows":
@@ -56,21 +64,33 @@ def fetch_core(tag, cache_dir):
     exe = os.path.join(cache_dir, f"mihomo-{tag}{'.exe' if platform.system() == 'windows' else ''}")
     if os.path.exists(exe):
         return exe
-    url = DOWNLOAD.format(tag=tag, slug=core_slug(tag))
+    slug = core_slug(tag)
+    assets = json.loads(gh_get(RELEASE_API.format(tag=tag))).get("assets", [])
+    # windows 资产是 zip(内含单文件),linux/macos 是 gz(单文件);按实际命名取
+    candidates = [a for a in assets if a["name"] in
+                  (f"mihomo-{slug}-{tag}.zip", f"mihomo-{slug}-{tag}.gz")]
+    if not candidates:
+        raise RuntimeError(f"no asset for {slug} in release {tag}: {[a['name'] for a in assets][:8]}")
+    url = candidates[0]["browser_download_url"]
     print(f"  downloading {url}")
     req = urllib.request.Request(url, headers={"Accept": "application/octet-stream"})
-    zpath = os.path.join(cache_dir, f"mihomo-{tag}.download.zip")
-    with urllib.request.urlopen(req, timeout=300) as resp, open(zpath, "wb") as f:
+    arch = os.path.join(cache_dir, candidates[0]["name"])
+    with urllib.request.urlopen(req, timeout=300) as resp, open(arch, "wb") as f:
         f.write(resp.read())
-    with zipfile.ZipFile(zpath) as zf:
-        members = [n for n in zf.namelist() if n.startswith("mihomo") and not n.endswith("/")]
-        if not members:
-            raise RuntimeError(f"no core binary in {zpath}: {zf.namelist()}")
-        zf.extract(members[0], cache_dir)
-        extracted = os.path.join(cache_dir, members[0])
-        if extracted != exe:
-            os.replace(extracted, exe)
-    os.remove(zpath)
+    if arch.endswith(".zip"):
+        with zipfile.ZipFile(arch) as zf:
+            members = [n for n in zf.namelist() if n.startswith("mihomo") and not n.endswith("/")]
+            if not members:
+                raise RuntimeError(f"no core binary in {arch}: {zf.namelist()}")
+            zf.extract(members[0], cache_dir)
+            extracted = os.path.join(cache_dir, members[0])
+            if extracted != exe:
+                os.replace(extracted, exe)
+    else:
+        import gzip
+        with gzip.open(arch, "rb") as src, open(exe, "wb") as dst:
+            dst.write(src.read())
+    os.remove(arch)
     os.chmod(exe, 0o755)
     return exe
 

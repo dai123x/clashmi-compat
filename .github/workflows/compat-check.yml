@@ -20,4 +20,6 @@ jobs:
           python-version: "3.12"
 
       - name: Run qingcha cloud compat matrix
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python compat_test/check_compat.py
