@@ -850,6 +850,9 @@ class ProfileManager {
         }
       }
       if (!success) {
+        Log.w(
+          "profile download failed :${profile.url}  ${result.error!.message.toString()}",
+        );
         updating.remove(id);
         Future.delayed(const Duration(milliseconds: 10), () async {
           for (var event in onEventUpdate) {
@@ -1085,9 +1088,6 @@ class ProfileManager {
   }
 
   static void reorder(int oldIndex, int newIndex) {
-    if (oldIndex < newIndex) {
-      newIndex -= 1;
-    }
     if (oldIndex >= _config.profiles.length ||
         newIndex >= _config.profiles.length) {
       return;

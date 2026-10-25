@@ -10,7 +10,6 @@ import 'package:clashmi/app/modules/auto_update_manager.dart';
 import 'package:clashmi/app/modules/biz.dart';
 import 'package:clashmi/app/modules/board_provider_manager.dart';
 import 'package:clashmi/app/modules/board_session_persistent_manager.dart';
-import 'package:clashmi/app/modules/clash_setting_manager.dart';
 import 'package:clashmi/app/modules/remote_config_manager.dart';
 import 'package:clashmi/app/modules/setting_manager.dart';
 import 'package:clashmi/app/utils/app_args.dart';
@@ -22,25 +21,27 @@ import 'package:clashmi/app/utils/move_to_background_utils.dart';
 import 'package:clashmi/app/utils/path_utils.dart';
 import 'package:clashmi/app/utils/platform_utils.dart';
 import 'package:clashmi/app/utils/system_scheme_utils.dart';
+import 'package:clashmi/app/utils/vpn_action_handler.dart';
 import 'package:clashmi/app/utils/windows_version_helper.dart';
 import 'package:clashmi/i18n/strings.g.dart';
 import 'package:clashmi/screens/home_screen.dart';
 import 'package:clashmi/screens/launch_failed_screen.dart';
 import 'package:clashmi/screens/theme_data_dark.dart';
 import 'package:clashmi/screens/themes.dart';
-import 'package:clashmi/app/utils/vpn_action_handler.dart';
 import 'package:clashmi/screens/widgets/routes.dart';
+import 'package:clashmi/tray.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_single_instance/flutter_single_instance.dart';
+import 'package:libclash_vpn_service/vpn_service.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:tray_manager/tray_manager.dart';
-import 'package:libclash_vpn_service/vpn_service.dart';
 import 'package:window_manager/window_manager.dart';
-import 'package:flutter_single_instance/flutter_single_instance.dart';
+import 'package:tray_manager/legacy.dart';
+import 'package:clashmi/app/modules/clash_setting_manager.dart';
 
 List<String> processArgs = [];
 StartFailedReason? startFailedReason;
@@ -183,7 +184,9 @@ Future<void> run(List<String> args) async {
   }
   try {
     await FastCachedImageConfig.init(subDir: AppUtils.getName());
+    SettingConfigItemUIScreen.fastCachedImageConfigInited = true;
   } catch (err, stacktrace) {
+    SettingConfigItemUIScreen.fastCachedImageConfigInited = false;
     Log.w("FastCachedImageConfig.init() exception: ${err.toString()}");
   }
   if (Platform.isAndroid) {
@@ -254,6 +257,7 @@ class MyAppState extends State<MyApp>
   bool _windowVisibleForMac = false;
   bool _trayGrey = true;
   Menu? _menu;
+  //Tray? _tray;
   String _trafficOld = "";
   String _speedOld = "";
   @override
@@ -263,6 +267,20 @@ class MyAppState extends State<MyApp>
     if (PlatformUtils.isPC()) {
       windowManager.addListener(this);
       windowManager.setPreventClose(true);
+      /*_tray = Tray();
+      _tray!.init(
+        onOpen: () async {
+          if (await windowManager.isMinimized()) {
+            await windowManager.restore();
+          } else {
+            await windowManager.show();
+            onWindowRestore();
+          }
+        },
+        onExit: () async {
+          await _quit();
+        },
+      );*/
       trayManager.addListener(this);
       _setTray(true, false, true);
     }
@@ -275,6 +293,17 @@ class MyAppState extends State<MyApp>
         if (_trafficOld != traffic || _speedOld != speed) {
           _trafficOld = traffic;
           _speedOld = speed;
+          /*if (traffic.isEmpty && speed.isEmpty) {
+            _tray?.setIconTitleForConnected("");
+          } else if (traffic.isNotEmpty && speed.isNotEmpty) {
+            _tray?.setIconTitleForConnected("$traffic $speed");
+          } else if (traffic.isNotEmpty) {
+            _tray?.setIconTitleForConnected(traffic);
+          } else if (speed.isNotEmpty) {
+            _tray?.setIconTitleForConnected(speed);
+          } else {
+            _tray?.setIconTitleForConnected("");
+          }*/
           if (traffic.isEmpty && speed.isEmpty) {
             trayManager.setTitle("");
           }
@@ -307,6 +336,8 @@ class MyAppState extends State<MyApp>
     WidgetsBinding.instance.removeObserver(this);
     if (PlatformUtils.isPC()) {
       windowManager.removeListener(this);
+      /*_tray?.dispose();
+      _tray = null;*/
       trayManager.removeListener(this);
       trayManager.destroy();
     }
@@ -485,6 +516,7 @@ class MyAppState extends State<MyApp>
 
     Biz.onEventVPNStateChanged = ((bool connected) {
       if (PlatformUtils.isPC()) {
+        // _tray?.setIconDisconneted(!connected);
         if (_trayGrey == !connected) {
           return;
         }
@@ -492,6 +524,7 @@ class MyAppState extends State<MyApp>
         if (Platform.isMacOS && !connected) {
           _trafficOld = "";
           _speedOld = "";
+          //_tray?.setIconTitleForConnected("");
           trayManager.setTitle("");
         }
       }

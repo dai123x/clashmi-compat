@@ -58,7 +58,8 @@ class ProxyHttpOverrides extends HttpOverrides {
 }
 
 class HomeScreenWidgetPart1 extends StatefulWidget {
-  const HomeScreenWidgetPart1({super.key});
+  final bool Function() hasDecoration;
+  const HomeScreenWidgetPart1({super.key, required this.hasDecoration});
 
   @override
   State<HomeScreenWidgetPart1> createState() => _HomeScreenWidgetPart1();
@@ -105,6 +106,9 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
       await _onInitAllFinish();
     });
     ClashSettingManager.onEventModeChanged.add(() async {
+      if (!mounted) {
+        return;
+      }
       setState(() {});
     });
   }
@@ -179,6 +183,8 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
   @override
   Widget build(BuildContext context) {
     final tcontext = Translations.of(context);
+    final theme = Theme.of(context);
+
     bool connected = _state == FlutterVpnServiceState.connected;
     final currentProfile = ProfileManager.getCurrent();
     final currentProfileName = currentProfile?.getShowName() ?? "";
@@ -187,6 +193,12 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
     );
 
     final settings = SettingManager.getConfig();
+    Color? color;
+    int alpha = settings.uiScreen.getWidgetAlpha();
+    if (widget.hasDecoration()) {
+      color = theme.colorScheme.surface;
+    }
+
     String tranffic = "";
     Tuple2<bool, String>? tranfficExpire;
     if (currentProfile != null && currentProfile.isRemote()) {
@@ -208,8 +220,10 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
         tranfficExpire = currentProfile.getExpireTime(settings.languageTag);
       }
     }
-    bool notice =
+    final notice =
         BoardProviderNoticeManager.getFirstUnread(provider?.id ?? "") != null;
+    final canShowVpnProvider =
+        provider != null && GroupHelper.canShowVpnProvider(provider);
     var widgets = [
       Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -244,8 +258,31 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
                       fit: BoxFit.fill,
                       child: Switch.adaptive(
                         value: _state == FlutterVpnServiceState.connected,
-                        activeThumbColor: Colors.white,
-                        activeTrackColor: ThemeDefine.kColorGreenBright,
+                        activeThumbColor: color != null ? null : Colors.white,
+                        activeTrackColor: color != null
+                            ? null
+                            : ThemeDefine.kColorGreenBright,
+                        thumbColor: color != null
+                            ? WidgetStateProperty.resolveWith<Color>((
+                                Set<WidgetState> states,
+                              ) {
+                                if (states.contains(WidgetState.selected)) {
+                                  return Colors.white.withValues(alpha: 0.8);
+                                }
+                                return Colors.white;
+                              })
+                            : null,
+                        trackColor: color != null
+                            ? WidgetStateProperty.resolveWith<Color>((
+                                Set<WidgetState> states,
+                              ) {
+                                if (states.contains(WidgetState.selected)) {
+                                  return ThemeDefine.kColorGreenBright
+                                      .withValues(alpha: 0.8);
+                                }
+                                return Colors.grey[200]!.withValues(alpha: 0.8);
+                              })
+                            : null,
                         focusNode: _focusNodeConnect,
                         onChanged: (bool value) async {
                           if (value) {
@@ -316,6 +353,7 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
         padding: const EdgeInsets.fromLTRB(0, 15, 0, 15),
         height: 70,
         child: SegmentedElevatedButton(
+          background: theme.colorScheme.surface.withAlpha(alpha),
           segments: [
             SegemntedElevatedButtonItem(
               value: ClashConfigsMode.rule.index,
@@ -390,12 +428,11 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
           ],
         ),
         trailing: SizedBox(
-          width: 100,
+          width: canShowVpnProvider ? 100 : 100 - 40,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              if (provider != null &&
-                  GroupHelper.canShowVpnProvider(provider)) ...[
+              if (canShowVpnProvider) ...[
                 SizedBox(
                   width: 40,
                   height: 40,
@@ -585,7 +622,10 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
         ),
       );
     }
+
     return Card(
+      color: color?.withAlpha(alpha),
+      shadowColor: color?.withAlpha(alpha),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
         child: ListView.separated(
@@ -1090,13 +1130,37 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
   }
 }
 
-class HomeScreenWidgetPart2 extends StatelessWidget {
-  const HomeScreenWidgetPart2({super.key});
+class HomeScreenWidgetPart2 extends StatefulWidget {
+  final bool Function() hasDecoration;
+  final Function()? onUpdate;
+  const HomeScreenWidgetPart2({
+    super.key,
+    this.onUpdate,
+    required this.hasDecoration,
+  });
+
+  @override
+  State<HomeScreenWidgetPart2> createState() => _HomeScreenWidgetPart2();
+}
+
+class _HomeScreenWidgetPart2 extends State<HomeScreenWidgetPart2> {
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     AutoUpdateCheckVersion versionCheck = AutoUpdateManager.getVersionCheck();
     final tcontext = Translations.of(context);
+    final theme = Theme.of(context);
+
+    final settings = SettingManager.getConfig();
+    Color? color;
+    int alpha = settings.uiScreen.getWidgetAlpha();
+    if (widget.hasDecoration()) {
+      color = theme.colorScheme.surface;
+    }
     var widgets = [
       ListTile(
         title: Text(tcontext.meta.settingApp),
@@ -1105,6 +1169,7 @@ class HomeScreenWidgetPart2 extends StatelessWidget {
         minVerticalPadding: 22,
         onTap: () async {
           await GroupHelper.showAppSettings(context);
+          widget.onUpdate?.call();
         },
       ),
       ListTile(
@@ -1214,6 +1279,8 @@ class HomeScreenWidgetPart2 extends StatelessWidget {
     ]);
 
     return Card(
+      color: color?.withAlpha(alpha),
+      shadowColor: color?.withAlpha(alpha),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
         child: ListView.separated(
